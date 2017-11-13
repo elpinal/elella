@@ -2,7 +2,7 @@
 #![warn(missing_docs)]
 
 enum Term {
-    Symbol,
+    Symbol(String),
 }
 
 #[cfg(test)]
