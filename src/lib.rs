@@ -1,6 +1,10 @@
 //! The Elella format.
 #![warn(missing_docs)]
 
+enum Term {
+    Symbol,
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
