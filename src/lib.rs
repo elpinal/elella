@@ -3,6 +3,7 @@
 
 enum Term {
     Symbol(String),
+    Var(String),
     Int(isize),
     Str(String),
 }
