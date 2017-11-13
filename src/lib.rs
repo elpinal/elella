@@ -4,6 +4,7 @@
 enum Term {
     Symbol(String),
     Int(isize),
+    Str(String),
 }
 
 #[cfg(test)]
