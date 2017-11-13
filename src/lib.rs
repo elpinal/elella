@@ -6,6 +6,7 @@ enum Term {
     Var(String),
     Int(isize),
     Str(String),
+    Bool(bool),
 }
 
 #[cfg(test)]
