@@ -9,6 +9,11 @@ enum Lit {
     Bool(bool),
 }
 
+enum Expr {
+    App(Box<Expr>, Vec<Expr>),
+    Lit(Lit),
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
