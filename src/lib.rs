@@ -3,6 +3,7 @@
 
 enum Term {
     Symbol(String),
+    Int(isize),
 }
 
 #[cfg(test)]
