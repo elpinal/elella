@@ -1,7 +1,7 @@
 //! The Elella format.
 #![warn(missing_docs)]
 
-enum Term {
+enum Lit {
     Symbol(String),
     Var(String),
     Int(isize),
