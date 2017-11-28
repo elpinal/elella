@@ -19,6 +19,11 @@ enum Expr {
     If(Box<Expr>, Box<Expr>, Box<Expr>)
 }
 
+enum Token {
+    LParen,
+    RParen,
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
