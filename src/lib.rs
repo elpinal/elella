@@ -24,6 +24,7 @@ enum Token {
     RParen,
     LBrack,
     RBrack,
+    Lit(Lit),
 }
 
 #[cfg(test)]
