@@ -15,6 +15,7 @@ enum Expr {
     App(Box<Expr>, Vec<Expr>),
     Lit(Lit),
     List(Vec<Expr>),
+    Vec(Vec<Expr>),
     Map(HashMap<String, Expr>),
     If(Box<Expr>, Box<Expr>, Box<Expr>)
 }
