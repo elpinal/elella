@@ -22,6 +22,8 @@ enum Expr {
 enum Token {
     LParen,
     RParen,
+    LBrack,
+    RBrack,
 }
 
 #[cfg(test)]
