@@ -12,6 +12,7 @@ enum Lit {
 enum Expr {
     App(Box<Expr>, Vec<Expr>),
     Lit(Lit),
+    List(Vec<Expr>),
 }
 
 #[cfg(test)]
