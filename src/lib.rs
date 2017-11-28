@@ -16,6 +16,7 @@ enum Expr {
     Lit(Lit),
     List(Vec<Expr>),
     Map(HashMap<String, Expr>),
+    If(Box<Expr>, Box<Expr>, Box<Expr>)
 }
 
 #[cfg(test)]
