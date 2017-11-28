@@ -24,6 +24,8 @@ enum Token {
     RParen,
     LBrack,
     RBrack,
+    LBrace,
+    RBrace,
     Lit(Lit),
 }
 
