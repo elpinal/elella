@@ -1,6 +1,8 @@
 //! The Elella format.
 #![warn(missing_docs)]
 
+use std::collections::HashMap;
+
 enum Lit {
     Symbol(String),
     Var(String),
@@ -13,6 +15,7 @@ enum Expr {
     App(Box<Expr>, Vec<Expr>),
     Lit(Lit),
     List(Vec<Expr>),
+    Map(HashMap<String, Expr>),
 }
 
 #[cfg(test)]
