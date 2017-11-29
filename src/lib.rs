@@ -11,7 +11,7 @@ use std::num::ParseIntError;
 
 #[derive(Debug, PartialEq)]
 enum Lit {
-    Symbol(String),
+    Keyword(String),
     Var(String),
     Int(isize),
     Str(String),
