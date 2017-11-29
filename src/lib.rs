@@ -6,6 +6,8 @@ use std::error::Error;
 use std::fmt;
 use std::io;
 use std::io::Read;
+use std::iter::Peekable;
+use std::num::ParseIntError;
 
 #[derive(Debug, PartialEq)]
 enum Lit {
@@ -37,7 +39,7 @@ enum Token {
 }
 
 struct Lexer<R: Read + Sized> {
-    bytes: io::Bytes<R>,
+    bytes: Peekable<io::Bytes<R>>,
 }
 
 impl<R> Lexer<R>
@@ -45,30 +47,61 @@ where
     R: Read,
 {
     fn new(r: R) -> Lexer<R> {
-        Lexer { bytes: r.bytes() }
+        Lexer { bytes: r.bytes().peekable() }
     }
 
-    fn next(&mut self) -> Result<Token, LexError> {
-        let b = self.bytes
+    fn peek(&mut self) -> Result<&Result<u8, io::Error>, LexError> {
+        match self.bytes.peek() {
+            Some(r) => Ok(r),
+            None => Err(LexError::EOF),
+        }
+    }
+
+    fn next(&mut self) -> Result<u8, LexError> {
+        self.bytes
             .next()
             .map(|r| r.map_err(|e| LexError::from(e)))
-            .unwrap_or(Err(LexError::EOF))?;
+            .unwrap_or(Err(LexError::EOF))
+    }
+
+    fn lex(&mut self) -> Result<Token, LexError> {
+        let b = self.next()?;
         match b {
-            b' ' => self.next(),
+            b' ' => self.lex(),
             b'(' => Ok(Token::LParen),
             b')' => Ok(Token::RParen),
             b'[' => Ok(Token::LBrack),
             b']' => Ok(Token::RBrack),
             b'{' => Ok(Token::LBrace),
             b'}' => Ok(Token::RBrace),
+            b'1'...b'9' => self.number(b),
             _ => Err(LexError::Illegal),
         }
+    }
+
+    fn number(&mut self, start: u8) -> Result<Token, LexError> {
+        let mut vec = vec![start];
+        loop {
+            let b = match self.peek()? {
+                &Ok(b) => b,
+                &Err(_) => self.next()?,
+            };
+            match b {
+                b'0'...b'9' => vec.push(b),
+                _ => break,
+            }
+            self.next()?;
+        }
+        let s = String::from_utf8_lossy(&vec);
+        let n: isize = s.parse()?;
+        Ok(Token::Lit(Lit::Int(n)))
     }
 }
 
 #[derive(Debug)]
 enum LexError {
     IOError(io::Error),
+    ParseInt(ParseIntError),
     EOF,
     Illegal,
 }
@@ -76,6 +109,12 @@ enum LexError {
 impl From<io::Error> for LexError {
     fn from(e: io::Error) -> LexError {
         LexError::IOError(e)
+    }
+}
+
+impl From<ParseIntError> for LexError {
+    fn from(e: ParseIntError) -> LexError {
+        LexError::ParseInt(e)
     }
 }
 
@@ -92,6 +131,7 @@ impl fmt::Display for LexError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             &LexError::IOError(ref e) => e.fmt(f),
+            &LexError::ParseInt(ref e) => e.fmt(f),
             &LexError::EOF => write!(f, "EOF"),
             &LexError::Illegal => write!(f, "Illegal byte"),
         }
@@ -102,6 +142,7 @@ impl Error for LexError {
     fn description(&self) -> &str {
         match self {
             &LexError::IOError(ref e) => e.description(),
+            &LexError::ParseInt(ref e) => e.description(),
             &LexError::EOF => "EOF",
             &LexError::Illegal => "Illegal byte",
         }
@@ -115,8 +156,16 @@ mod tests {
     #[test]
     fn test_lexer() {
         let mut l = Lexer::new(&[b'(', b' ', b')'][..]);
-        assert_eq!(l.next().ok(), Some(Token::LParen));
-        assert_eq!(l.next().ok(), Some(Token::RParen));
-        assert_eq!(l.next().err().map(|e| e.is_eof()), Some(true));
+        assert_eq!(l.lex().ok(), Some(Token::LParen));
+        assert_eq!(l.lex().ok(), Some(Token::RParen));
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+    }
+
+    #[test]
+    fn test_lex_number() {
+        let mut l = Lexer::new("123)".as_bytes());
+        assert_eq!(l.lex().ok(), Some(Token::Lit(Lit::Int(123))));
+        assert_eq!(l.lex().ok(), Some(Token::RParen));
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
     }
 }
