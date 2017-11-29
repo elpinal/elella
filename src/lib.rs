@@ -78,6 +78,7 @@ where
             b']' => Ok(Token::RBrack),
             b'{' => Ok(Token::LBrace),
             b'}' => Ok(Token::RBrace),
+            b';' => Ok(Token::Semicolon),
             b'1'...b'9' => self.number(b),
             b':' => self.keyword(),
             _ => Err(LexError::Illegal),
