@@ -103,11 +103,15 @@ where
     fn keyword(&mut self) -> Result<Token, LexError> {
         let mut vec = Vec::new();
         loop {
-            let j = self.bytes.peek();
-            if j.is_none() {
-                break;
+            let k;
+            {
+                let j = self.bytes.peek();
+                if j.is_none() {
+                    break;
+                }
+                k = j.unwrap();
             }
-            let b = match j.unwrap() {
+            let b = match k {
                 &Ok(b) => b,
                 &Err(_) => self.next()?,
             };
