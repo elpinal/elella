@@ -96,6 +96,23 @@ where
         let n: isize = s.parse()?;
         Ok(Token::Lit(Lit::Int(n)))
     }
+
+    fn keyword(&mut self) -> Result<Token, LexError> {
+        let mut vec = Vec::new();
+        loop {
+            let b = match self.peek()? {
+                &Ok(b) => b,
+                &Err(_) => self.next()?,
+            };
+            match b {
+                b'a'...b'z' | b'A'...b'Z' => vec.push(b),
+                _ => break,
+            }
+            self.next()?;
+        }
+        let s = String::from_utf8_lossy(&vec);
+        Ok(Token::Lit(Lit::Keyword(String::from(s))))
+    }
 }
 
 #[derive(Debug)]
