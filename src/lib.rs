@@ -186,4 +186,11 @@ mod tests {
         assert_eq!(l.lex().ok(), Some(Token::RParen));
         assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
     }
+
+    #[test]
+    fn test_lex_keyword() {
+        let mut l = Lexer::new(":abc".as_bytes());
+        assert_eq!(l.lex().ok(), Some(Token::Lit(Lit::Keyword(String::from("abc")))));
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+    }
 }
