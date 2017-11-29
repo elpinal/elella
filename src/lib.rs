@@ -17,7 +17,7 @@ enum Expr {
     List(Vec<Expr>),
     Vec(Vec<Expr>),
     Map(HashMap<String, Expr>),
-    If(Box<Expr>, Box<Expr>, Box<Expr>)
+    If(Box<Expr>, Box<Expr>, Box<Expr>),
 }
 
 enum Token {
