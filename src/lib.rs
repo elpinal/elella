@@ -2,9 +2,12 @@
 #![warn(missing_docs)]
 
 use std::collections::HashMap;
+use std::error::Error;
+use std::fmt;
 use std::io;
 use std::io::Read;
 
+#[derive(Debug, PartialEq)]
 enum Lit {
     Symbol(String),
     Var(String),
@@ -22,6 +25,7 @@ enum Expr {
     If(Box<Expr>, Box<Expr>, Box<Expr>),
 }
 
+#[derive(Debug, PartialEq)]
 enum Token {
     LParen,
     RParen,
@@ -80,6 +84,26 @@ impl LexError {
         match self {
             &LexError::EOF => true,
             _ => false,
+        }
+    }
+}
+
+impl fmt::Display for LexError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            &LexError::IOError(ref e) => e.fmt(f),
+            &LexError::EOF => write!(f, "EOF"),
+            &LexError::Illegal => write!(f, "Illegal byte"),
+        }
+    }
+}
+
+impl Error for LexError {
+    fn description(&self) -> &str {
+        match self {
+            &LexError::IOError(ref e) => e.description(),
+            &LexError::EOF => "EOF",
+            &LexError::Illegal => "Illegal byte",
         }
     }
 }
