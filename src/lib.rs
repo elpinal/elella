@@ -116,7 +116,7 @@ where
                 &Err(_) => self.next()?,
             };
             match b {
-                b'a'...b'z' | b'A'...b'Z' => vec.push(b),
+                b'a'...b'z' | b'A'...b'Z' | b'-' => vec.push(b),
                 _ => break,
             }
             self.next()?;
