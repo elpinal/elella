@@ -35,6 +35,7 @@ enum Token {
     RBrack,
     LBrace,
     RBrace,
+    Semicolon,
     Lit(Lit),
     If,
     Def,
