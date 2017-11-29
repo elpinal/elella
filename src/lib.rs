@@ -38,6 +38,7 @@ enum Token {
     Lit(Lit),
     If,
     Def,
+    Nil,
 }
 
 struct Lexer<R: Read + Sized> {
