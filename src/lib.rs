@@ -75,6 +75,7 @@ where
             b'{' => Ok(Token::LBrace),
             b'}' => Ok(Token::RBrace),
             b'1'...b'9' => self.number(b),
+            b':' => self.keyword(),
             _ => Err(LexError::Illegal),
         }
     }
