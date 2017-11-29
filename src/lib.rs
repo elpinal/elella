@@ -101,7 +101,11 @@ where
     fn keyword(&mut self) -> Result<Token, LexError> {
         let mut vec = Vec::new();
         loop {
-            let b = match self.peek()? {
+            let j = self.bytes.peek();
+            if j.is_none() {
+                break;
+            }
+            let b = match j.unwrap() {
                 &Ok(b) => b,
                 &Err(_) => self.next()?,
             };
