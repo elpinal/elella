@@ -36,6 +36,7 @@ enum Token {
     LBrace,
     RBrace,
     Lit(Lit),
+    If,
 }
 
 struct Lexer<R: Read + Sized> {
