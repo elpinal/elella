@@ -2,6 +2,8 @@
 #![warn(missing_docs)]
 
 use std::collections::HashMap;
+use std::io;
+use std::io::Read;
 
 enum Lit {
     Symbol(String),
@@ -30,10 +32,67 @@ enum Token {
     Lit(Lit),
 }
 
+struct Lexer<R: Read + Sized> {
+    bytes: io::Bytes<R>,
+}
+
+impl<R> Lexer<R>
+where
+    R: Read,
+{
+    fn new(r: R) -> Lexer<R> {
+        Lexer { bytes: r.bytes() }
+    }
+
+    fn next(&mut self) -> Result<Token, LexError> {
+        let b = self.bytes
+            .next()
+            .map(|r| r.map_err(|e| LexError::from(e)))
+            .unwrap_or(Err(LexError::EOF))?;
+        match b {
+            b' ' => self.next(),
+            b'(' => Ok(Token::LParen),
+            b')' => Ok(Token::RParen),
+            b'[' => Ok(Token::LBrack),
+            b']' => Ok(Token::RBrack),
+            b'{' => Ok(Token::LBrace),
+            b'}' => Ok(Token::RBrace),
+            _ => Err(LexError::Illegal),
+        }
+    }
+}
+
+#[derive(Debug)]
+enum LexError {
+    IOError(io::Error),
+    EOF,
+    Illegal,
+}
+
+impl From<io::Error> for LexError {
+    fn from(e: io::Error) -> LexError {
+        LexError::IOError(e)
+    }
+}
+
+impl LexError {
+    fn is_eof(&self) -> bool {
+        match self {
+            &LexError::EOF => true,
+            _ => false,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn test_lexer() {
+        let mut l = Lexer::new(&[b'(', b' ', b')'][..]);
+        assert_eq!(l.next().ok(), Some(Token::LParen));
+        assert_eq!(l.next().ok(), Some(Token::RParen));
+        assert_eq!(l.next().err().map(|e| e.is_eof()), Some(true));
     }
 }
