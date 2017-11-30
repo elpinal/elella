@@ -1,4 +1,4 @@
-//! A Lexer for the Elella format.
+//! A lexer for the Elella format.
 //!
 //! ```
 //! use elella::lexer::*;
