@@ -142,7 +142,7 @@ fn is_symbol(b: u8) -> bool {
 
 #[derive(Debug)]
 enum LexError {
-    IOError(io::Error),
+    IO(io::Error),
     ParseInt(ParseIntError),
     EOF,
     Illegal,
@@ -150,7 +150,7 @@ enum LexError {
 
 impl From<io::Error> for LexError {
     fn from(e: io::Error) -> LexError {
-        LexError::IOError(e)
+        LexError::IO(e)
     }
 }
 
@@ -172,7 +172,7 @@ impl LexError {
 impl fmt::Display for LexError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            &LexError::IOError(ref e) => e.fmt(f),
+            &LexError::IO(ref e) => e.fmt(f),
             &LexError::ParseInt(ref e) => e.fmt(f),
             &LexError::EOF => write!(f, "EOF"),
             &LexError::Illegal => write!(f, "Illegal byte"),
@@ -183,7 +183,7 @@ impl fmt::Display for LexError {
 impl Error for LexError {
     fn description(&self) -> &str {
         match self {
-            &LexError::IOError(ref e) => e.description(),
+            &LexError::IO(ref e) => e.description(),
             &LexError::ParseInt(ref e) => e.description(),
             &LexError::EOF => "EOF",
             &LexError::Illegal => "Illegal byte",
