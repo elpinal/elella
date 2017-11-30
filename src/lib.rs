@@ -105,27 +105,38 @@ where
 
     fn keyword(&mut self) -> Result<Token, LexError> {
         let mut vec = Vec::new();
+        self.read_keyword(&mut vec)?;
+        Ok(Token::Lit(
+            Lit::Keyword(String::from(String::from_utf8_lossy(&vec))),
+        ))
+    }
+
+    fn read_keyword(&mut self, vec: &mut Vec<u8>) -> Result<(), LexError> {
         loop {
-            let k;
-            {
-                let j = self.bytes.peek();
-                if j.is_none() {
-                    break;
+            match self.bytes.peek() {
+                None => return Ok(()),
+                Some(k) => {
+                    match k {
+                        &Err(_) => (),
+                        &Ok(b) => {
+                            if is_symbol(b) {
+                                vec.push(b);
+                            } else {
+                                return Ok(());
+                            }
+                        }
+                    }
                 }
-                k = j.unwrap();
             }
-            let b = match k {
-                &Ok(b) => b,
-                &Err(_) => self.next()?,
-            };
-            match b {
-                b'a'...b'z' | b'A'...b'Z' | b'-' | b'*' | b'\'' => vec.push(b),
-                _ => break,
-            }
-            self.next()?;
+            self.bytes.next().unwrap()?;
         }
-        let s = String::from_utf8_lossy(&vec);
-        Ok(Token::Lit(Lit::Keyword(String::from(s))))
+    }
+}
+
+fn is_symbol(b: u8) -> bool {
+    match b {
+        b'a'...b'z' | b'A'...b'Z' | b'-' | b'*' | b'\'' => true,
+        _ => false,
     }
 }
 
