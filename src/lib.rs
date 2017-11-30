@@ -8,6 +8,7 @@ use std::io;
 use std::io::Read;
 use std::iter::Peekable;
 use std::num::ParseIntError;
+use std::string::FromUtf8Error;
 
 #[derive(Debug, PartialEq)]
 enum Lit {
@@ -106,9 +107,7 @@ where
     fn keyword(&mut self) -> Result<Token, LexError> {
         let mut vec = Vec::new();
         self.read_keyword(&mut vec)?;
-        Ok(Token::Lit(
-            Lit::Keyword(String::from(String::from_utf8_lossy(&vec))),
-        ))
+        Ok(Token::Lit(Lit::Keyword(String::from_utf8(vec)?)))
     }
 
     fn read_keyword(&mut self, vec: &mut Vec<u8>) -> Result<(), LexError> {
@@ -144,6 +143,7 @@ fn is_symbol(b: u8) -> bool {
 enum LexError {
     IO(io::Error),
     ParseInt(ParseIntError),
+    Utf8(FromUtf8Error),
     EOF,
     Illegal,
 }
@@ -157,6 +157,12 @@ impl From<io::Error> for LexError {
 impl From<ParseIntError> for LexError {
     fn from(e: ParseIntError) -> LexError {
         LexError::ParseInt(e)
+    }
+}
+
+impl From<FromUtf8Error> for LexError {
+    fn from(e: FromUtf8Error) -> LexError {
+        LexError::Utf8(e)
     }
 }
 
@@ -174,6 +180,7 @@ impl fmt::Display for LexError {
         match self {
             &LexError::IO(ref e) => e.fmt(f),
             &LexError::ParseInt(ref e) => e.fmt(f),
+            &LexError::Utf8(ref e) => e.fmt(f),
             &LexError::EOF => write!(f, "EOF"),
             &LexError::Illegal => write!(f, "Illegal byte"),
         }
@@ -185,6 +192,7 @@ impl Error for LexError {
         match self {
             &LexError::IO(ref e) => e.description(),
             &LexError::ParseInt(ref e) => e.description(),
+            &LexError::Utf8(ref e) => e.description(),
             &LexError::EOF => "EOF",
             &LexError::Illegal => "Illegal byte",
         }
