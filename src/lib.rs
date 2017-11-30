@@ -86,19 +86,16 @@ where
         }
     }
 
-    fn number(&mut self, start: u8) -> Result<Token, LexError> {
-        let mut vec = vec![start];
-        self.read_number(&mut vec)?;
-        Ok(Token::Lit(Lit::Int(String::from_utf8(vec)?.parse()?)))
-    }
-
-    fn read_number(&mut self, vec: &mut Vec<u8>) -> Result<(), LexError> {
+    fn read<P>(&mut self, vec: &mut Vec<u8>, p: P) -> Result<(), LexError>
+    where
+        P: Fn(u8) -> bool,
+    {
         loop {
             match self.bytes.peek() {
                 None => return Ok(()),
                 Some(k) => {
                     if let &Ok(b) = k {
-                        if !is_digit(b) {
+                        if !p(b) {
                             return Ok(());
                         }
                         vec.push(b);
@@ -107,6 +104,16 @@ where
             }
             self.bytes.next().unwrap()?;
         }
+    }
+
+    fn number(&mut self, start: u8) -> Result<Token, LexError> {
+        let mut vec = vec![start];
+        self.read_number(&mut vec)?;
+        Ok(Token::Lit(Lit::Int(String::from_utf8(vec)?.parse()?)))
+    }
+
+    fn read_number(&mut self, vec: &mut Vec<u8>) -> Result<(), LexError> {
+        self.read(vec, is_digit)
     }
 
     fn keyword(&mut self) -> Result<Token, LexError> {
@@ -116,20 +123,7 @@ where
     }
 
     fn read_keyword(&mut self, vec: &mut Vec<u8>) -> Result<(), LexError> {
-        loop {
-            match self.bytes.peek() {
-                None => return Ok(()),
-                Some(k) => {
-                    if let &Ok(b) = k {
-                        if !is_symbol(b) {
-                            return Ok(());
-                        }
-                        vec.push(b);
-                    }
-                }
-            }
-            self.bytes.next().unwrap()?;
-        }
+        self.read(vec, is_symbol)
     }
 }
 
