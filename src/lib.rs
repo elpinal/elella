@@ -82,6 +82,7 @@ where
             b';' => Ok(Token::Semicolon),
             b'1'...b'9' => self.number(b),
             b':' => self.keyword(),
+            b'"' => self.string(),
             _ if is_symbol(b) => self.var(b),
             _ => Err(LexError::Illegal),
         }
@@ -132,6 +133,15 @@ where
         self.read(&mut vec, is_symbol)?;
         Ok(Token::Lit(Lit::Var(String::from_utf8(vec)?)))
     }
+
+    fn string(&mut self) -> Result<Token, LexError> {
+        let mut vec = Vec::new();
+        self.read(&mut vec, |b| b != b'"')?;
+        if self.bytes.next().is_none() {
+            return Err(LexError::Terminate);
+        }
+        Ok(Token::Lit(Lit::Str(String::from_utf8(vec)?)))
+    }
 }
 
 fn is_digit(b: u8) -> bool {
@@ -153,6 +163,7 @@ enum LexError {
     IO(io::Error),
     ParseInt(ParseIntError),
     Utf8(FromUtf8Error),
+    Terminate,
     EOF,
     Illegal,
 }
@@ -182,6 +193,13 @@ impl LexError {
             _ => false,
         }
     }
+
+    fn is_terminate(&self) -> bool {
+        match self {
+            &LexError::Terminate => true,
+            _ => false,
+        }
+    }
 }
 
 impl fmt::Display for LexError {
@@ -190,6 +208,7 @@ impl fmt::Display for LexError {
             &LexError::IO(ref e) => e.fmt(f),
             &LexError::ParseInt(ref e) => e.fmt(f),
             &LexError::Utf8(ref e) => e.fmt(f),
+            &LexError::Terminate => write!(f, "EOF while string literal not terminated"),
             &LexError::EOF => write!(f, "EOF"),
             &LexError::Illegal => write!(f, "Illegal byte"),
         }
@@ -202,6 +221,7 @@ impl Error for LexError {
             &LexError::IO(ref e) => e.description(),
             &LexError::ParseInt(ref e) => e.description(),
             &LexError::Utf8(ref e) => e.description(),
+            &LexError::Terminate => "EOF while string literal not terminated",
             &LexError::EOF => "EOF",
             &LexError::Illegal => "Illegal byte",
         }
@@ -269,5 +289,29 @@ mod tests {
             Some(Token::Lit(Lit::Keyword(String::from("***"))))
         );
         assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+    }
+
+    #[test]
+    fn test_lex_string() {
+        let mut l = Lexer::new(r#""abc""#.as_bytes());
+        assert_eq!(
+            l.lex().ok(),
+            Some(Token::Lit(Lit::Str(String::from("abc"))))
+        );
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+
+        let mut l = Lexer::new(r#""aA* Z-:***":a"#.as_bytes());
+        assert_eq!(
+            l.lex().ok(),
+            Some(Token::Lit(Lit::Str(String::from("aA* Z-:***"))))
+        );
+        assert_eq!(
+            l.lex().ok(),
+            Some(Token::Lit(Lit::Keyword(String::from("a"))))
+        );
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+
+        let mut l = Lexer::new(r#""abc"#.as_bytes());
+        assert_eq!(l.lex().err().map(|e| e.is_terminate()), Some(true));
     }
 }
