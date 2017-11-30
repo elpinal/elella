@@ -117,6 +117,9 @@ where
     fn keyword(&mut self) -> Result<Token, LexError> {
         let mut vec = Vec::new();
         self.read(&mut vec, is_symbol)?;
+        if vec.is_empty() {
+            return Err(LexError::Illegal);
+        }
         Ok(Token::Lit(Lit::Keyword(String::from_utf8(vec)?)))
     }
 
@@ -179,6 +182,13 @@ impl From<FromUtf8Error> for LexError {
 }
 
 impl LexError {
+    fn is_terminate(&self) -> bool {
+        match self {
+            &LexError::Terminate => true,
+            _ => false,
+        }
+    }
+
     fn is_eof(&self) -> bool {
         match self {
             &LexError::EOF => true,
@@ -186,9 +196,9 @@ impl LexError {
         }
     }
 
-    fn is_terminate(&self) -> bool {
+    fn is_illegal(&self) -> bool {
         match self {
-            &LexError::Terminate => true,
+            &LexError::Illegal => true,
             _ => false,
         }
     }
@@ -246,6 +256,9 @@ mod tests {
 
     #[test]
     fn test_lex_keyword() {
+        let mut l = Lexer::new(":".as_bytes());
+        assert_eq!(l.lex().err().map(|e| e.is_illegal()), Some(true));
+
         let mut l = Lexer::new(":abc".as_bytes());
         assert_eq!(
             l.lex().ok(),
