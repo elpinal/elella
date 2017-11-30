@@ -1,7 +1,7 @@
 //! The Elella format.
 #![warn(missing_docs)]
 
-mod lexer;
+pub mod lexer;
 
 use std::collections::HashMap;
 

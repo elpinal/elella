@@ -1,3 +1,16 @@
+//! A Lexer for the Elella format.
+//!
+//! ```
+//! use elella::lexer::*;
+//!
+//! let mut l = Lexer::new("[:a 1]".as_bytes());
+//! assert_eq!(l.lex().ok(), Some(Token::LBrack));
+//! assert_eq!(l.lex().ok(), Some(Token::Lit(Lit::Keyword(String::from("a")))));
+//! assert_eq!(l.lex().ok(), Some(Token::Lit(Lit::Int(1))));
+//! assert_eq!(l.lex().ok(), Some(Token::RBrack));
+//! assert_eq!(l.lex().unwrap_err().is_eof(), true);
+//! ```
+
 use std::error::Error;
 use std::fmt;
 use std::io;
@@ -16,7 +29,7 @@ pub enum Lit {
 }
 
 #[derive(Debug, PartialEq)]
-enum Token {
+pub enum Token {
     LParen,
     RParen,
     LBrack,
@@ -30,7 +43,7 @@ enum Token {
     Nil,
 }
 
-struct Lexer<R: Read + Sized> {
+pub struct Lexer<R: Read + Sized> {
     bytes: Peekable<io::Bytes<R>>,
 }
 
@@ -38,7 +51,7 @@ impl<R> Lexer<R>
 where
     R: Read,
 {
-    fn new(r: R) -> Lexer<R> {
+    pub fn new(r: R) -> Lexer<R> {
         Lexer { bytes: r.bytes().peekable() }
     }
 
@@ -56,7 +69,7 @@ where
             .unwrap_or(Err(LexError::EOF))
     }
 
-    fn lex(&mut self) -> Result<Token, LexError> {
+    pub fn lex(&mut self) -> Result<Token, LexError> {
         let b = self.next()?;
         match b {
             b' ' => self.lex(),
@@ -146,7 +159,7 @@ fn is_symbol(b: u8) -> bool {
 }
 
 #[derive(Debug)]
-enum LexError {
+pub enum LexError {
     IO(io::Error),
     ParseInt(ParseIntError),
     Utf8(FromUtf8Error),
@@ -181,7 +194,7 @@ impl LexError {
         }
     }
 
-    fn is_eof(&self) -> bool {
+    pub fn is_eof(&self) -> bool {
         match self {
             &LexError::EOF => true,
             _ => false,
