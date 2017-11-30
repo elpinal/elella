@@ -83,7 +83,7 @@ where
             b'1'...b'9' => self.number(b),
             b':' => self.keyword(),
             b'"' => self.string(),
-            _ if is_symbol(b) => self.var(b),
+            _ if is_symbol(b) => self.ident(b),
             _ => Err(LexError::Illegal),
         }
     }
@@ -123,10 +123,15 @@ where
         Ok(Token::Lit(Lit::Keyword(String::from_utf8(vec)?)))
     }
 
-    fn var(&mut self, start: u8) -> Result<Token, LexError> {
+    fn ident(&mut self, start: u8) -> Result<Token, LexError> {
         let mut vec = vec![start];
         self.read(&mut vec, is_symbol)?;
-        Ok(Token::Lit(Lit::Var(String::from_utf8(vec)?)))
+        let s = String::from_utf8(vec)?;
+        match s {
+            _ if s == "true" => Ok(Token::Lit(Lit::Bool(true))),
+            _ if s == "false" => Ok(Token::Lit(Lit::Bool(false))),
+            _ => Ok(Token::Lit(Lit::Var(s))),
+        }
     }
 
     fn string(&mut self) -> Result<Token, LexError> {
@@ -297,7 +302,49 @@ mod tests {
     }
 
     #[test]
+    fn test_lex_reserved() {
+        let mut l = Lexer::new("true".as_bytes());
+        assert_eq!(
+            l.lex().ok(),
+            Some(Token::Lit(Lit::Bool(true)))
+        );
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+
+        let mut l = Lexer::new("false".as_bytes());
+        assert_eq!(
+            l.lex().ok(),
+            Some(Token::Lit(Lit::Bool(false)))
+        );
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+
+        let mut l = Lexer::new("tru".as_bytes());
+        assert_eq!(
+            l.lex().ok(),
+            Some(Token::Lit(Lit::Var(String::from("tru"))))
+        );
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+
+        let mut l = Lexer::new("truE".as_bytes());
+        assert_eq!(
+            l.lex().ok(),
+            Some(Token::Lit(Lit::Var(String::from("truE"))))
+        );
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+
+        let mut l = Lexer::new("trues".as_bytes());
+        assert_eq!(
+            l.lex().ok(),
+            Some(Token::Lit(Lit::Var(String::from("trues"))))
+        );
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+    }
+
+    #[test]
     fn test_lex_string() {
+        let mut l = Lexer::new(r#""""#.as_bytes());
+        assert_eq!(l.lex().ok(), Some(Token::Lit(Lit::Str(String::from("")))));
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+
         let mut l = Lexer::new(r#""abc""#.as_bytes());
         assert_eq!(
             l.lex().ok(),
