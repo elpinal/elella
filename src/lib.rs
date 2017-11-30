@@ -239,24 +239,28 @@ impl Error for LexError {
 mod tests {
     use super::*;
 
+    macro_rules! lex_test {
+        ( $s:expr, $( $x:expr ),* ) => {
+            {
+                let mut l = Lexer::new($s.as_bytes());
+                $(
+                    assert_eq!(l.lex().ok(), Some($x));
+                )*
+                assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+            }
+        };
+    }
+
     #[test]
     fn test_lexer() {
-        let mut l = Lexer::new(&[b'(', b' ', b')'][..]);
-        assert_eq!(l.lex().ok(), Some(Token::LParen));
-        assert_eq!(l.lex().ok(), Some(Token::RParen));
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+        lex_test!("( )", Token::LParen, Token::RParen);
     }
 
     #[test]
     fn test_lex_number() {
-        let mut l = Lexer::new("123)".as_bytes());
-        assert_eq!(l.lex().ok(), Some(Token::Lit(Lit::Int(123))));
-        assert_eq!(l.lex().ok(), Some(Token::RParen));
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+        lex_test!("123)", Token::Lit(Lit::Int(123)), Token::RParen);
 
-        let mut l = Lexer::new("10".as_bytes());
-        assert_eq!(l.lex().ok(), Some(Token::Lit(Lit::Int(10))));
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+        lex_test!("10", Token::Lit(Lit::Int(10)));
     }
 
     #[test]
@@ -264,104 +268,50 @@ mod tests {
         let mut l = Lexer::new(":".as_bytes());
         assert_eq!(l.lex().err().map(|e| e.is_illegal()), Some(true));
 
-        let mut l = Lexer::new(":abc".as_bytes());
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Keyword(String::from("abc"))))
-        );
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+        lex_test!(":abc", Token::Lit(Lit::Keyword(String::from("abc"))));
 
-        let mut l = Lexer::new(":aA*Z-]".as_bytes());
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Keyword(String::from("aA*Z-"))))
+        lex_test!(
+            ":aA*Z-]",
+            Token::Lit(Lit::Keyword(String::from("aA*Z-"))),
+            Token::RBrack
         );
-        assert_eq!(l.lex().ok(), Some(Token::RBrack));
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
     }
 
     #[test]
     fn test_lex_var() {
-        let mut l = Lexer::new("abc".as_bytes());
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Var(String::from("abc"))))
-        );
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+        lex_test!("abc", (Token::Lit(Lit::Var(String::from("abc")))));
 
-        let mut l = Lexer::new("aA*Z-:***".as_bytes());
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Var(String::from("aA*Z-"))))
+        lex_test!(
+            "aA*Z-:***",
+            (Token::Lit(Lit::Var(String::from("aA*Z-")))),
+            (Token::Lit(Lit::Keyword(String::from("***"))))
         );
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Keyword(String::from("***"))))
-        );
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
     }
 
     #[test]
     fn test_lex_reserved() {
-        let mut l = Lexer::new("true".as_bytes());
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Bool(true)))
-        );
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+        lex_test!("true", (Token::Lit(Lit::Bool(true))));
 
-        let mut l = Lexer::new("false".as_bytes());
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Bool(false)))
-        );
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+        lex_test!("false", (Token::Lit(Lit::Bool(false))));
 
-        let mut l = Lexer::new("tru".as_bytes());
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Var(String::from("tru"))))
-        );
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+        lex_test!("tru", (Token::Lit(Lit::Var(String::from("tru")))));
 
-        let mut l = Lexer::new("truE".as_bytes());
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Var(String::from("truE"))))
-        );
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+        lex_test!("truE", (Token::Lit(Lit::Var(String::from("truE")))));
 
-        let mut l = Lexer::new("trues".as_bytes());
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Var(String::from("trues"))))
-        );
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+        lex_test!("trues", (Token::Lit(Lit::Var(String::from("trues")))));
     }
 
     #[test]
     fn test_lex_string() {
-        let mut l = Lexer::new(r#""""#.as_bytes());
-        assert_eq!(l.lex().ok(), Some(Token::Lit(Lit::Str(String::from("")))));
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+        lex_test!(r#""""#, (Token::Lit(Lit::Str(String::from("")))));
 
-        let mut l = Lexer::new(r#""abc""#.as_bytes());
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Str(String::from("abc"))))
-        );
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+        lex_test!(r#""abc""#, (Token::Lit(Lit::Str(String::from("abc")))));
 
-        let mut l = Lexer::new(r#""aA* Z-:***":a"#.as_bytes());
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Str(String::from("aA* Z-:***"))))
+        lex_test!(
+            r#""aA* Z-:***":a"#,
+            (Token::Lit(Lit::Str(String::from("aA* Z-:***")))),
+            (Token::Lit(Lit::Keyword(String::from("a"))))
         );
-        assert_eq!(
-            l.lex().ok(),
-            Some(Token::Lit(Lit::Keyword(String::from("a"))))
-        );
-        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
 
         let mut l = Lexer::new(r#""abc"#.as_bytes());
         assert_eq!(l.lex().err().map(|e| e.is_terminate()), Some(true));
