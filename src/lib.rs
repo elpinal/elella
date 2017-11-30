@@ -115,15 +115,11 @@ where
             match self.bytes.peek() {
                 None => return Ok(()),
                 Some(k) => {
-                    match k {
-                        &Err(_) => (),
-                        &Ok(b) => {
-                            if is_symbol(b) {
-                                vec.push(b);
-                            } else {
-                                return Ok(());
-                            }
+                    if let &Ok(b) = k {
+                        if !is_symbol(b) {
+                            return Ok(());
                         }
+                        vec.push(b);
                     }
                 }
             }
