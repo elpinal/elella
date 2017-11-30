@@ -88,20 +88,25 @@ where
 
     fn number(&mut self, start: u8) -> Result<Token, LexError> {
         let mut vec = vec![start];
+        self.read_number(&mut vec)?;
+        Ok(Token::Lit(Lit::Int(String::from_utf8(vec)?.parse()?)))
+    }
+
+    fn read_number(&mut self, vec: &mut Vec<u8>) -> Result<(), LexError> {
         loop {
-            let b = match self.peek()? {
-                &Ok(b) => b,
-                &Err(_) => self.next()?,
-            };
-            match b {
-                b'0'...b'9' => vec.push(b),
-                _ => break,
+            match self.bytes.peek() {
+                None => return Ok(()),
+                Some(k) => {
+                    if let &Ok(b) = k {
+                        if !is_digit(b) {
+                            return Ok(());
+                        }
+                        vec.push(b);
+                    }
+                }
             }
-            self.next()?;
+            self.bytes.next().unwrap()?;
         }
-        let s = String::from_utf8_lossy(&vec);
-        let n: isize = s.parse()?;
-        Ok(Token::Lit(Lit::Int(n)))
     }
 
     fn keyword(&mut self) -> Result<Token, LexError> {
@@ -125,6 +130,13 @@ where
             }
             self.bytes.next().unwrap()?;
         }
+    }
+}
+
+fn is_digit(b: u8) -> bool {
+    match b {
+        b'0'...b'9' => true,
+        _ => false,
     }
 }
 
@@ -212,6 +224,10 @@ mod tests {
         let mut l = Lexer::new("123)".as_bytes());
         assert_eq!(l.lex().ok(), Some(Token::Lit(Lit::Int(123))));
         assert_eq!(l.lex().ok(), Some(Token::RParen));
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+
+        let mut l = Lexer::new("10".as_bytes());
+        assert_eq!(l.lex().ok(), Some(Token::Lit(Lit::Int(10))));
         assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
     }
 
