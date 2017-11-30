@@ -82,6 +82,7 @@ where
             b';' => Ok(Token::Semicolon),
             b'1'...b'9' => self.number(b),
             b':' => self.keyword(),
+            _ if is_symbol(b) => self.var(b),
             _ => Err(LexError::Illegal),
         }
     }
@@ -124,6 +125,12 @@ where
 
     fn read_keyword(&mut self, vec: &mut Vec<u8>) -> Result<(), LexError> {
         self.read(vec, is_symbol)
+    }
+
+    fn var(&mut self, start: u8) -> Result<Token, LexError> {
+        let mut vec = vec![start];
+        self.read(&mut vec, is_symbol)?;
+        Ok(Token::Lit(Lit::Var(String::from_utf8(vec)?)))
     }
 }
 
@@ -240,6 +247,27 @@ mod tests {
             Some(Token::Lit(Lit::Keyword(String::from("aA*Z-"))))
         );
         assert_eq!(l.lex().ok(), Some(Token::RBrack));
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+    }
+
+    #[test]
+    fn test_lex_var() {
+        let mut l = Lexer::new("abc".as_bytes());
+        assert_eq!(
+            l.lex().ok(),
+            Some(Token::Lit(Lit::Var(String::from("abc"))))
+        );
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+
+        let mut l = Lexer::new("aA*Z-:***".as_bytes());
+        assert_eq!(
+            l.lex().ok(),
+            Some(Token::Lit(Lit::Var(String::from("aA*Z-"))))
+        );
+        assert_eq!(
+            l.lex().ok(),
+            Some(Token::Lit(Lit::Keyword(String::from("***"))))
+        );
         assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
     }
 }
