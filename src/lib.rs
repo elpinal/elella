@@ -110,22 +110,14 @@ where
 
     fn number(&mut self, start: u8) -> Result<Token, LexError> {
         let mut vec = vec![start];
-        self.read_number(&mut vec)?;
+        self.read(&mut vec, is_digit)?;
         Ok(Token::Lit(Lit::Int(String::from_utf8(vec)?.parse()?)))
-    }
-
-    fn read_number(&mut self, vec: &mut Vec<u8>) -> Result<(), LexError> {
-        self.read(vec, is_digit)
     }
 
     fn keyword(&mut self) -> Result<Token, LexError> {
         let mut vec = Vec::new();
-        self.read_keyword(&mut vec)?;
+        self.read(&mut vec, is_symbol)?;
         Ok(Token::Lit(Lit::Keyword(String::from_utf8(vec)?)))
-    }
-
-    fn read_keyword(&mut self, vec: &mut Vec<u8>) -> Result<(), LexError> {
-        self.read(vec, is_symbol)
     }
 
     fn var(&mut self, start: u8) -> Result<Token, LexError> {
