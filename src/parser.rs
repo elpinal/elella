@@ -56,3 +56,32 @@ impl<R: Read> Parser<R> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    macro_rules! parse_test {
+        ( $s:expr, $( $x:expr ),* ) => {
+            {
+                let mut l = Parser::new($s.as_bytes());
+                $(
+                    assert_eq!(l.parse().ok(), Some($x));
+                )*
+            }
+        };
+    }
+
+    #[test]
+    fn test_parse_vector() {
+        parse_test!("[]", Expr::Vec(Vec::new()));
+        parse_test!("[1]", Expr::Vec(vec![Expr::Lit(Lit::Int(1))]));
+        parse_test!(
+            "[:a x]",
+            Expr::Vec(vec![
+                Expr::Lit(Lit::Keyword(String::from("a"))),
+                Expr::Lit(Lit::Var(String::from("x"))),
+            ])
+        );
+    }
+}
