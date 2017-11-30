@@ -65,7 +65,7 @@ where
     pub fn lex(&mut self) -> Result<Token, LexError> {
         let b = self.next()?;
         match b {
-            b' ' => self.lex(),
+            b' ' | b',' => self.lex(),
             b'(' => Ok(Token::LParen),
             b')' => Ok(Token::RParen),
             b'[' => Ok(Token::LBrack),
@@ -247,6 +247,7 @@ mod tests {
     #[test]
     fn test_lexer() {
         lex_test!("( )", Token::LParen, Token::RParen);
+        lex_test!("(,)", Token::LParen, Token::RParen);
     }
 
     #[test]

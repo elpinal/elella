@@ -83,5 +83,12 @@ mod tests {
                 Expr::Lit(Lit::Var(String::from("x"))),
             ])
         );
+        parse_test!(
+            "[:a, x]",
+            Expr::Vec(vec![
+                Expr::Lit(Lit::Keyword(String::from("a"))),
+                Expr::Lit(Lit::Var(String::from("x"))),
+            ])
+        );
     }
 }
