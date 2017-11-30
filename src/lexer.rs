@@ -55,13 +55,6 @@ where
         Lexer { bytes: r.bytes().peekable() }
     }
 
-    fn peek(&mut self) -> Result<&Result<u8, io::Error>, LexError> {
-        match self.bytes.peek() {
-            Some(r) => Ok(r),
-            None => Err(LexError::EOF),
-        }
-    }
-
     fn next(&mut self) -> Result<u8, LexError> {
         self.bytes
             .next()
