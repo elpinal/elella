@@ -239,5 +239,13 @@ mod tests {
             Some(Token::Lit(Lit::Keyword(String::from("abc"))))
         );
         assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
+
+        let mut l = Lexer::new(":aA*Z-]".as_bytes());
+        assert_eq!(
+            l.lex().ok(),
+            Some(Token::Lit(Lit::Keyword(String::from("aA*Z-"))))
+        );
+        assert_eq!(l.lex().ok(), Some(Token::RBrack));
+        assert_eq!(l.lex().err().map(|e| e.is_eof()), Some(true));
     }
 }
