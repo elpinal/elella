@@ -41,6 +41,7 @@ impl<R: Read> Parser<R> {
     pub fn parse(&mut self) -> Result<Expr, LexError> {
         match self.l.lex()? {
             Token::LBrack => self.vector(),
+            Token::LBrace => self.map(),
             _ => unimplemented!(),
         }
     }
@@ -51,6 +52,27 @@ impl<R: Read> Parser<R> {
             match self.l.lex()? {
                 Token::RBrack => return Ok(Expr::Vec(vec)),
                 Token::Lit(l) => vec.push(Expr::Lit(l)),
+                _ => unimplemented!(),
+            }
+        }
+    }
+
+    fn map(&mut self) -> Result<Expr, LexError> {
+        let mut m = HashMap::new();
+        loop {
+            let k;
+            match self.l.lex()? {
+                Token::RBrace => return Ok(Expr::Map(m)),
+                Token::Lit(Lit::Keyword(s)) => k = s,
+                _ => unimplemented!(),
+            }
+            match self.l.lex()? {
+                Token::RBrace => panic!("not even map"),
+                Token::Lit(l) => {
+                    if m.insert(k, Expr::Lit(l)).is_some() {
+                        panic!("dups in map");
+                    }
+                }
                 _ => unimplemented!(),
             }
         }
