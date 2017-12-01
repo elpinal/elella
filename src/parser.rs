@@ -70,7 +70,7 @@ impl<R: Read> Parser<R> {
                 Token::RBrace => panic!("not even map"),
                 Token::Lit(l) => {
                     if m.insert(k.clone(), Expr::Lit(l)).is_some() {
-                        return Err(ParseError::DupKeys(k))
+                        return Err(ParseError::DupKeys(k));
                     }
                 }
                 _ => unimplemented!(),
