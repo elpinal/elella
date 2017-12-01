@@ -127,4 +127,13 @@ mod tests {
         m.insert(String::from("b"), Expr::Lit(Lit::Keyword(String::from("c"))));
         parse_test!("{:a 1, :b :c}", Expr::Map(m));
     }
+
+    #[test]
+    #[should_panic]
+    fn test_parse_map_fail() {
+        let mut m = HashMap::new();
+        m.insert(String::from("a"), Expr::Lit(Lit::Int(1)));
+        m.insert(String::from("a"), Expr::Lit(Lit::Keyword(String::from("c"))));
+        parse_test!("{:a 1, :a :c}", Expr::Map(m));
+    }
 }
