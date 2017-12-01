@@ -113,4 +113,9 @@ mod tests {
             ])
         );
     }
+
+    #[test]
+    fn test_parse_map() {
+        parse_test!("{}", Expr::Map(HashMap::new()));
+    }
 }
