@@ -117,5 +117,9 @@ mod tests {
     #[test]
     fn test_parse_map() {
         parse_test!("{}", Expr::Map(HashMap::new()));
+
+        let mut m = HashMap::new();
+        m.insert(String::from("a"), Expr::Lit(Lit::Int(1)));
+        parse_test!("{:a 1}", Expr::Map(m));
     }
 }
