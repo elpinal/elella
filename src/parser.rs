@@ -38,7 +38,7 @@ impl<R: Read> Parser<R> {
         Parser { l: Lexer::new(r) }
     }
 
-    pub fn parse(&mut self) -> Result<Expr, LexError> {
+    pub fn parse(&mut self) -> Result<Expr, ParseError> {
         match self.l.lex()? {
             Token::LBrack => self.vector(),
             Token::LBrace => self.map(),
@@ -46,7 +46,7 @@ impl<R: Read> Parser<R> {
         }
     }
 
-    fn vector(&mut self) -> Result<Expr, LexError> {
+    fn vector(&mut self) -> Result<Expr, ParseError> {
         let mut vec = Vec::new();
         loop {
             match self.l.lex()? {
@@ -57,7 +57,7 @@ impl<R: Read> Parser<R> {
         }
     }
 
-    fn map(&mut self) -> Result<Expr, LexError> {
+    fn map(&mut self) -> Result<Expr, ParseError> {
         let mut m = HashMap::new();
         loop {
             let k;
@@ -79,7 +79,7 @@ impl<R: Read> Parser<R> {
     }
 }
 
-enum ParseError {
+pub enum ParseError {
     Lex(LexError),
 }
 
