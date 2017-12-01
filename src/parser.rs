@@ -79,6 +79,16 @@ impl<R: Read> Parser<R> {
     }
 }
 
+enum ParseError {
+    Lex(LexError),
+}
+
+impl From<LexError> for ParseError {
+    fn from(e: LexError) -> ParseError {
+        ParseError::Lex(e)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
