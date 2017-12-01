@@ -121,5 +121,10 @@ mod tests {
         let mut m = HashMap::new();
         m.insert(String::from("a"), Expr::Lit(Lit::Int(1)));
         parse_test!("{:a 1}", Expr::Map(m));
+
+        let mut m = HashMap::new();
+        m.insert(String::from("a"), Expr::Lit(Lit::Int(1)));
+        m.insert(String::from("b"), Expr::Lit(Lit::Keyword(String::from("c"))));
+        parse_test!("{:a 1, :b :c}", Expr::Map(m));
     }
 }
