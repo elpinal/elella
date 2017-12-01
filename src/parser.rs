@@ -90,6 +90,16 @@ impl From<LexError> for ParseError {
     }
 }
 
+impl ParseError {
+    fn is_dupkeys(&self) -> bool {
+        if let &ParseError::DupKeys(_) = self {
+            true
+        } else {
+            false
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -143,14 +153,8 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn test_parse_map_fail() {
-        let mut m = HashMap::new();
-        m.insert(String::from("a"), Expr::Lit(Lit::Int(1)));
-        m.insert(
-            String::from("a"),
-            Expr::Lit(Lit::Keyword(String::from("c"))),
-        );
-        parse_test!("{:a 1, :a :c}", Expr::Map(m));
+        let mut p = Parser::new("{:a 1, :a :c}".as_bytes());
+        assert!(p.parse().unwrap_err().is_dupkeys());
     }
 }
