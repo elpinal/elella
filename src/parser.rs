@@ -164,5 +164,8 @@ mod tests {
     fn test_parse_map_fail() {
         let mut p = Parser::new("{:a 1, :a :c}".as_bytes());
         assert!(p.parse().unwrap_err().is_dupkeys());
+
+        let mut p = Parser::new("{:a 1, :b}".as_bytes());
+        assert!(p.parse().unwrap_err().is_oddmap());
     }
 }
