@@ -34,6 +34,13 @@ pub struct Parser<R: Read> {
 }
 
 impl<R: Read> Parser<R> {
+    /// Creates a new parser with a input reader.
+    ///
+    /// ```
+    /// use elella::parser::Parser;
+    ///
+    /// let p = Parser::new("abcd".as_bytes());
+    /// ```
     pub fn new(r: R) -> Parser<R> {
         Parser { l: Lexer::new(r) }
     }
