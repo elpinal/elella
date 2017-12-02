@@ -28,6 +28,7 @@ pub enum Expr {
     Lit(Lit),
     /// A list.
     List(Vec<Expr>),
+    /// A vector.
     Vec(Vec<Expr>),
     Map(HashMap<String, Expr>),
     If(Box<Expr>, Box<Expr>, Box<Expr>),
