@@ -19,6 +19,7 @@ use lexer::*;
 
 pub use lexer::Lit;
 
+/// An expression.
 #[derive(Debug, PartialEq)]
 pub enum Expr {
     App(Box<Expr>, Vec<Expr>),
