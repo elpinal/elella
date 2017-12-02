@@ -26,6 +26,7 @@ pub enum Expr {
     App(Box<Expr>, Vec<Expr>),
     /// A literal expression.
     Lit(Lit),
+    /// A list.
     List(Vec<Expr>),
     Vec(Vec<Expr>),
     Map(HashMap<String, Expr>),
