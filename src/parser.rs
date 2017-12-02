@@ -29,6 +29,7 @@ pub enum Expr {
     If(Box<Expr>, Box<Expr>, Box<Expr>),
 }
 
+/// A parser which contaiins its reader.
 pub struct Parser<R: Read> {
     l: Lexer<R>,
 }
