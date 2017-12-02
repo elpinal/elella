@@ -22,6 +22,7 @@ pub use lexer::Lit;
 /// An expression.
 #[derive(Debug, PartialEq)]
 pub enum Expr {
+    /// A function application which contains a functions and its arguments.
     App(Box<Expr>, Vec<Expr>),
     Lit(Lit),
     List(Vec<Expr>),
