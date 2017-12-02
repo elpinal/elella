@@ -29,6 +29,7 @@ pub enum Lit {
     Bool(bool),
 }
 
+/// A token.
 #[derive(Debug, PartialEq)]
 pub enum Token {
     LParen,
