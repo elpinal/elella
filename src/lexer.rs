@@ -187,6 +187,7 @@ impl LexError {
         }
     }
 
+    /// Test an error is caused by EOF.
     pub fn is_eof(&self) -> bool {
         match self {
             &LexError::EOF => true,
