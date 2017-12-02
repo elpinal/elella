@@ -38,6 +38,7 @@ impl<R: Read> Parser<R> {
         Parser { l: Lexer::new(r) }
     }
 
+    /// Parses an expression from the inner reader.
     pub fn parse(&mut self) -> Result<Expr, ParseError> {
         match self.l.lex()? {
             Token::LBrack => self.vector(),
