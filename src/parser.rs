@@ -81,8 +81,11 @@ impl<R: Read> Parser<R> {
 
 /// Errors which represents some errors on parsing.
 pub enum ParseError {
+    /// Lexing error.
     Lex(LexError),
+    /// Duplicate keys in map literals.
     DupKeys(String),
+    /// An odd number of entries in map literals.
     OddMap,
 }
 
