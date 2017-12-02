@@ -93,10 +93,9 @@ impl From<LexError> for ParseError {
 
 impl ParseError {
     fn is_dupkeys(&self) -> bool {
-        if let &ParseError::DupKeys(_) = self {
-            true
-        } else {
-            false
+        match self {
+            &ParseError::DupKeys(_) => true,
+            _ => false,
         }
     }
 
