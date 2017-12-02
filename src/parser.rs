@@ -32,6 +32,7 @@ pub enum Expr {
     Vec(Vec<Expr>),
     /// A map.
     Map(HashMap<String, Expr>),
+    /// An if-expression.
     If(Box<Expr>, Box<Expr>, Box<Expr>),
 }
 
