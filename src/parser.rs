@@ -24,6 +24,7 @@ pub use lexer::Lit;
 pub enum Expr {
     /// A function application which contains a functions and its arguments.
     App(Box<Expr>, Vec<Expr>),
+    /// A literal expression.
     Lit(Lit),
     List(Vec<Expr>),
     Vec(Vec<Expr>),
