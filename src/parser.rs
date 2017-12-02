@@ -99,6 +99,13 @@ impl ParseError {
             false
         }
     }
+
+    fn is_oddmap(&self) -> bool {
+        match self {
+            &ParseError::OddMap => true,
+            _ => false,
+        }
+    }
 }
 
 #[cfg(test)]
