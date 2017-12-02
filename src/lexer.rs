@@ -151,6 +151,7 @@ fn is_symbol(b: u8) -> bool {
     }
 }
 
+/// An error while lexing.
 #[derive(Debug)]
 pub enum LexError {
     IO(io::Error),
