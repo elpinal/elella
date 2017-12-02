@@ -30,6 +30,7 @@ pub enum Expr {
     List(Vec<Expr>),
     /// A vector.
     Vec(Vec<Expr>),
+    /// A map.
     Map(HashMap<String, Expr>),
     If(Box<Expr>, Box<Expr>, Box<Expr>),
 }
