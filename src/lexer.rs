@@ -19,6 +19,7 @@ use std::iter::Peekable;
 use std::num::ParseIntError;
 use std::string::FromUtf8Error;
 
+/// A literal.
 #[derive(Debug, PartialEq)]
 pub enum Lit {
     Keyword(String),
