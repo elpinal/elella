@@ -79,6 +79,7 @@ impl<R: Read> Parser<R> {
     }
 }
 
+/// Errors which represents some errors on parsing.
 pub enum ParseError {
     Lex(LexError),
     DupKeys(String),
