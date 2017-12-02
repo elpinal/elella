@@ -67,7 +67,7 @@ impl<R: Read> Parser<R> {
                 _ => unimplemented!(),
             }
             match self.l.lex()? {
-                Token::RBrace => panic!("not even map"),
+                Token::RBrace => return Err(ParseError::OddMap),
                 Token::Lit(l) => {
                     if m.insert(k.clone(), Expr::Lit(l)).is_some() {
                         return Err(ParseError::DupKeys(k));
@@ -82,6 +82,7 @@ impl<R: Read> Parser<R> {
 pub enum ParseError {
     Lex(LexError),
     DupKeys(String),
+    OddMap,
 }
 
 impl From<LexError> for ParseError {
