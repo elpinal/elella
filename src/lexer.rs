@@ -161,6 +161,7 @@ pub enum LexError {
     Utf8(FromUtf8Error),
     Terminate,
     EOF,
+    /// Illegal byte.
     Illegal,
 }
 
