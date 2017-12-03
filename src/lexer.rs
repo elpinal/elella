@@ -156,6 +156,7 @@ fn is_symbol(b: u8) -> bool {
 /// An error while lexing.
 #[derive(Debug)]
 pub enum LexError {
+    /// Error on IO.
     IO(io::Error),
     /// Invalid integer literal.
     ParseInt(ParseIntError),
