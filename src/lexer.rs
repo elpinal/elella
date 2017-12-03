@@ -158,6 +158,7 @@ fn is_symbol(b: u8) -> bool {
 pub enum LexError {
     IO(io::Error),
     ParseInt(ParseIntError),
+    /// Invalid UTF-8 error.
     Utf8(FromUtf8Error),
     /// An error that indicates "string literal is not terminated."
     Terminate,
