@@ -58,6 +58,7 @@ impl<R: Read> Parser<R> {
         match self.l.lex()? {
             Token::LBrack => self.vector(),
             Token::LBrace => self.map(),
+            Token::LParen => self.app(),
             _ => unimplemented!(),
         }
     }
@@ -89,6 +90,25 @@ impl<R: Read> Parser<R> {
                         return Err(ParseError::DupKeys(k));
                     }
                 }
+                _ => unimplemented!(),
+            }
+        }
+    }
+
+    fn app(&mut self) -> Result<Expr, ParseError> {
+        let mut vec = Vec::new();
+        let f;
+
+        match self.l.lex()? {
+            Token::RParen => return Ok(Expr::List(vec)),
+            Token::Lit(l) => f = Expr::Lit(l),
+            _ => unimplemented!(),
+        }
+
+        loop {
+            match self.l.lex()? {
+                Token::RParen => return Ok(Expr::App(Box::from(f), vec)),
+                Token::Lit(l) => vec.push(Expr::Lit(l)),
                 _ => unimplemented!(),
             }
         }
