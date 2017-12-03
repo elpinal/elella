@@ -45,6 +45,7 @@ pub enum Token {
     Nil,
 }
 
+/// A lexer.
 pub struct Lexer<R: Read + Sized> {
     bytes: Peekable<io::Bytes<R>>,
 }
