@@ -32,11 +32,17 @@ pub enum Lit {
 /// A token.
 #[derive(Debug, PartialEq)]
 pub enum Token {
+    /// '('.
     LParen,
+    /// ')'.
     RParen,
+    /// '['.
     LBrack,
+    /// ']'.
     RBrack,
+    /// '{'.
     LBrace,
+    /// '}'.
     RBrace,
     Semicolon,
     Lit(Lit),
