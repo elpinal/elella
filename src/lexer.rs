@@ -160,6 +160,7 @@ pub enum LexError {
     ParseInt(ParseIntError),
     Utf8(FromUtf8Error),
     Terminate,
+    /// EOF.
     EOF,
     /// Illegal byte.
     Illegal,
