@@ -25,6 +25,7 @@ pub enum Lit {
     Keyword(String),
     Var(String),
     Int(isize),
+    /// A string literal.
     Str(String),
     /// A boolean literal.
     Bool(bool),
