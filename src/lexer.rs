@@ -24,6 +24,7 @@ use std::string::FromUtf8Error;
 pub enum Lit {
     Keyword(String),
     Var(String),
+    /// A integer literal.
     Int(isize),
     /// A string literal.
     Str(String),
