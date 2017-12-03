@@ -48,8 +48,11 @@ pub enum Token {
     Semicolon,
     /// A literal.
     Lit(Lit),
+    /// 'if'.
     If,
+    /// 'def'.
     Def,
+    /// 'nil'.
     Nil,
 }
 
