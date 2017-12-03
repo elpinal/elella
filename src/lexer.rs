@@ -64,6 +64,7 @@ where
             .unwrap_or(Err(LexError::EOF))
     }
 
+    /// Lexes a token from inner bytes.
     pub fn lex(&mut self) -> Result<Token, LexError> {
         let b = self.next()?;
         match b {
