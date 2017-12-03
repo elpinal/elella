@@ -157,6 +157,7 @@ fn is_symbol(b: u8) -> bool {
 #[derive(Debug)]
 pub enum LexError {
     IO(io::Error),
+    /// Invalid integer literal.
     ParseInt(ParseIntError),
     /// Invalid UTF-8 error.
     Utf8(FromUtf8Error),
