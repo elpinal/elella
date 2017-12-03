@@ -22,6 +22,7 @@ use std::string::FromUtf8Error;
 /// A literal.
 #[derive(Debug, PartialEq)]
 pub enum Lit {
+    /// A keyword literal.
     Keyword(String),
     /// A variable literal.
     Var(String),
