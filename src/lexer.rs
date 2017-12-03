@@ -44,6 +44,7 @@ pub enum Token {
     LBrace,
     /// '}'.
     RBrace,
+    /// ';'.
     Semicolon,
     Lit(Lit),
     If,
