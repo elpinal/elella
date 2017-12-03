@@ -159,6 +159,7 @@ pub enum LexError {
     IO(io::Error),
     ParseInt(ParseIntError),
     Utf8(FromUtf8Error),
+    /// An error that indicates "string literal is not terminated."
     Terminate,
     /// EOF.
     EOF,
