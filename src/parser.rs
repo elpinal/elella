@@ -48,6 +48,8 @@ impl<R: Read> Parser<R> {
     /// use elella::parser::Parser;
     ///
     /// let p = Parser::new("abcd".as_bytes());
+    ///
+    /// // Do something with a parser...
     /// ```
     pub fn new(r: R) -> Parser<R> {
         Parser { l: Lexer::new(r) }
