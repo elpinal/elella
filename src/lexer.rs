@@ -97,7 +97,7 @@ where
             b']' => Ok(Token::RBrack),
             b'{' => Ok(Token::LBrace),
             b'}' => Ok(Token::RBrace),
-            b';' => Ok(Token::Semicolon),
+            b';' => self.comment()?,
             b'\'' => Ok(Token::Quote),
             b'1'...b'9' => self.number(b),
             b':' => self.keyword(),
@@ -161,6 +161,11 @@ where
             return Err(LexError::Terminate);
         }
         Ok(Token::Lit(Lit::Str(String::from_utf8(vec)?)))
+    }
+
+    fn comment(&mut self) -> Result<Token, LexError> {
+        unimplemented!();
+        self.lex()
     }
 }
 
