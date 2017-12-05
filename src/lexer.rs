@@ -51,6 +51,8 @@ pub enum Token {
     RBrace,
     /// A token of `;`.
     Semicolon,
+    /// A token of `'`.
+    Quote,
     /// A token for a literal.
     Lit(Lit),
     /// A token of `if`.
