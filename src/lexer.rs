@@ -96,6 +96,7 @@ where
             b'{' => Ok(Token::LBrace),
             b'}' => Ok(Token::RBrace),
             b';' => Ok(Token::Semicolon),
+            b'\'' => Ok(Token::Quote),
             b'1'...b'9' => self.number(b),
             b':' => self.keyword(),
             b'"' => self.string(),
