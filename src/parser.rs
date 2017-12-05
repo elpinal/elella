@@ -61,6 +61,7 @@ impl<R: Read> Parser<R> {
             Token::LBrack => self.vector(),
             Token::LBrace => self.map(),
             Token::LParen => self.app(),
+            Token::Quote => self.list(),
             _ => unimplemented!(),
         }
     }
@@ -110,6 +111,21 @@ impl<R: Read> Parser<R> {
         loop {
             match self.l.lex()? {
                 Token::RParen => return Ok(Expr::App(Box::from(f), vec)),
+                Token::Lit(l) => vec.push(Expr::Lit(l)),
+                _ => unimplemented!(),
+            }
+        }
+    }
+
+    fn list(&mut self) -> Result<Expr, ParseError> {
+        match self.l.lex()? {
+            Token::LParen => (),
+            _ => unimplemented!(),
+        }
+        let mut vec = Vec::new();
+        loop {
+            match self.l.lex()? {
+                Token::RParen => return Ok(Expr::Vec(vec)),
                 Token::Lit(l) => vec.push(Expr::Lit(l)),
                 _ => unimplemented!(),
             }
