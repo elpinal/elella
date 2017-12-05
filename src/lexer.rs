@@ -280,6 +280,7 @@ mod tests {
     fn test_lexer() {
         lex_test!("( )", Token::LParen, Token::RParen);
         lex_test!("(,)", Token::LParen, Token::RParen);
+        lex_test!(";'", Token::Semicolon, Token::Quote);
     }
 
     #[test]
