@@ -97,7 +97,7 @@ where
             b']' => Ok(Token::RBrack),
             b'{' => Ok(Token::LBrace),
             b'}' => Ok(Token::RBrace),
-            b';' => self.comment()?,
+            b';' => self.comment(),
             b'\'' => Ok(Token::Quote),
             b'1'...b'9' => self.number(b),
             b':' => self.keyword(),
