@@ -101,6 +101,7 @@ where
             b'}' => Ok(Token::RBrace),
             b';' => self.comment(),
             b'\'' => Ok(Token::Quote),
+            b'#' => Ok(Token::Sharp),
             b'1'...b'9' => self.number(b),
             b':' => self.keyword(),
             b'"' => self.string(),
