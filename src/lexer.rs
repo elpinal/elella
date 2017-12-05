@@ -55,6 +55,7 @@ pub enum Token {
     Semicolon,
     /// A token of `'`.
     Quote,
+    /// A token of '#'.
     Sharp,
     /// A token for a literal.
     Lit(Lit),
