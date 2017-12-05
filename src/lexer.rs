@@ -32,6 +32,7 @@ pub enum Lit {
     Str(String),
     /// A boolean literal.
     Bool(bool),
+    Nil,
 }
 
 /// A token.
