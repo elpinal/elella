@@ -170,7 +170,7 @@ fn is_digit(b: u8) -> bool {
 
 fn is_symbol(b: u8) -> bool {
     match b {
-        b'a'...b'z' | b'A'...b'Z' | b'-' | b'*' | b'\'' => true,
+        b'a'...b'z' | b'A'...b'Z' | b'-' | b'*' | b'\'' | b'+' => true,
         _ => false,
     }
 }
