@@ -125,7 +125,7 @@ impl<R: Read> Parser<R> {
         let mut vec = Vec::new();
         loop {
             match self.l.lex()? {
-                Token::RParen => return Ok(Expr::Vec(vec)),
+                Token::RParen => return Ok(Expr::List(vec)),
                 Token::Lit(l) => vec.push(Expr::Lit(l)),
                 _ => unimplemented!(),
             }
@@ -224,5 +224,25 @@ mod tests {
 
         let mut p = Parser::new("{:a 1, :b}".as_bytes());
         assert!(p.parse().unwrap_err().is_oddmap());
+    }
+
+    #[test]
+    fn test_parse_list() {
+        parse_test!("'()", Expr::List(Vec::new()));
+        parse_test!("'(1)", Expr::List(vec![Expr::Lit(Lit::Int(1))]));
+        parse_test!(
+            "'(:a x)",
+            Expr::List(vec![
+                Expr::Lit(Lit::Keyword(String::from("a"))),
+                Expr::Lit(Lit::Var(String::from("x"))),
+            ])
+        );
+        parse_test!(
+            "'(:a, x)",
+            Expr::List(vec![
+                Expr::Lit(Lit::Keyword(String::from("a"))),
+                Expr::Lit(Lit::Var(String::from("x"))),
+            ])
+        );
     }
 }
