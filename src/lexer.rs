@@ -149,6 +149,7 @@ where
         match s {
             _ if s == "true" => Ok(Token::Lit(Lit::Bool(true))),
             _ if s == "false" => Ok(Token::Lit(Lit::Bool(false))),
+            _ if s == "nil" => Ok(Token::Lit(Lit::Nil)),
             _ => Ok(Token::Lit(Lit::Var(s))),
         }
     }
